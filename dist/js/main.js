@@ -164,7 +164,6 @@ class NewCard {
     }
 
     render(){
-        console.log(this.classes);
         const element = document.createElement('div');
         if(this.classes.length === 0){
             this.classes = 'menu__item';
@@ -206,5 +205,41 @@ newCardMenu("img/tabs/vegy.jpg","vegy",'"Фитнес"','Меню "Фитнес"
 newCardMenu("img/tabs/elite.jpg","elite",'Меню “Премиум”','В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',21,".menu .container",'menu__item');
 newCardMenu("img/tabs/post.jpg","post",'"Постное"','Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',14,".menu .container",'menu__item');
 
+//-----------------Forms
 
+const forms = document.querySelectorAll('form');
+const messegeS = {
+    loading: 'Загрузка...',
+    success: 'Спасибо! Скоро мы с вами свяжемся',
+    failure: 'Что-то пошло не так...'
+};
+forms.forEach(function(item){
+    postData(item);
+});
+
+function postData (form){
+    form.addEventListener('submit', (e)=>{
+        e.preventDefault();
+
+        const statusMessage = document.createElement('div');
+        statusMessage.classList.add('status');
+        statusMessage.textContent = messegeS.loading;
+        form.appendChild (statusMessage);
+
+        const r = new XMLHttpRequest();
+        r.open('POST', 'server.php');
+        // r.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+
+        const formData = new FormData(form);
+
+        r.send(formData);
+
+        r.addEventListener('load', ()=>{
+            if(r.status === 200){
+                console.log(r.responseText);
+                statusMessage.textContent = messegeS.success;
+            } else {statusMessage.textContent = messegeS.failure;}
+        });
+    });
+}
 });

@@ -35,10 +35,10 @@ document.addEventListener('DOMContentLoaded', function(){
 
             if(target && target.classList.contains('tabheader__item')){
                 tabs.forEach((item, i)=>{
-                  if (target == item){
-                      hideTabContent();
-                      showTabContent(i);
-                  }
+                    if (target == item){
+                        hideTabContent();
+                        showTabContent(i);
+                    }
                 });
             }
         });
@@ -80,17 +80,17 @@ document.addEventListener('DOMContentLoaded', function(){
                 seconds = timer.querySelector('#seconds'),
                 setinterval = setInterval(updateClock, 1000);
         updateClock();
-                function updateClock() {
-                    const t = getTimer(endtime);
-        
-                    days.innerHTML = zeroSet(t.d);
-                    hours.innerHTML = zeroSet(t.h);
-                    minutes.innerHTML = zeroSet(t.m);
-                    seconds.innerHTML = zeroSet(t.s);
-                    if (t.t <= 0) {
-                        clearInterval(setinterval);
-                    }
-                }
+        function updateClock() {
+            const t = getTimer(endtime);
+
+            days.innerHTML = zeroSet(t.d);
+            hours.innerHTML = zeroSet(t.h);
+            minutes.innerHTML = zeroSet(t.m);
+            seconds.innerHTML = zeroSet(t.s);
+            if (t.t <= 0) {
+                clearInterval(setinterval);
+            }
+        }
     }
 
     setTimer('.timer', now);
@@ -189,10 +189,7 @@ class NewCard {
 
         this.perentSelector.append(element);
     }
-    
 }
-
-
 
 function newCardMenu(src, alt, title, descrip, price, perentSelector,...classes) {
     new NewCard (
@@ -212,8 +209,8 @@ newCardMenu("img/tabs/post.jpg","post",'"Постное"','Меню “Пост�
 //-----------------Forms
 
 const forms = document.querySelectorAll('form');
-const messegeS = {
-    loading: 'Загрузка...',
+const messege = {
+    loading: 'img/form/spinner.svg',
     success: 'Спасибо! Ваш запрос принят)',
     failure: 'Что-то пошло не так...'
 };
@@ -226,9 +223,12 @@ function postData (form){
         
         e.preventDefault();
 
-        const statusMessage = document.createElement('div');
-        statusMessage.classList.add('status');
-        statusMessage.textContent = messegeS.loading;
+        const statusMessage = document.createElement('img');
+        statusMessage.src = messege.loading;
+        statusMessage.style.cssText = `
+            display: block;
+            margin: 0 auto;
+        `;
         form.appendChild (statusMessage);
 
         const r = new XMLHttpRequest();
@@ -246,7 +246,11 @@ function postData (form){
                 form.reset();
                 statusMessage.remove();
                 closeModal();
-            } else {statusMessage.textContent = messegeS.failure;}
+                setTimeout(()=>{
+                    modal.classList.remove('show');
+                    modalBlock.remove();
+                }, 4000);
+            } else {statusMessage.textContent = messege.failure;}
         });
 
         function closeModal (){

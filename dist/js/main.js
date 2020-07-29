@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function(){
 //--------------------------Timer
 
 
-    const now = new Date('2020-07-29 00:00:00');
+    const now = new Date('2020-08-29 00:00:00');
 
     function getTimer(endtime) {
         const t = Date.parse(endtime) - Date.parse(new Date()),
@@ -98,35 +98,33 @@ document.addEventListener('DOMContentLoaded', function(){
 
     const btn = document.querySelectorAll('[data-open]'),
         modal = document.querySelector('.modal'),
-        close = document.querySelector('.modal__close'),
-        modalBlock = document.createElement('div'),
         formInput = document.querySelectorAll('input');
 
     function addClassShow() {
-
-        modal.classList.toggle('show');
+        modal.classList.add('show');
+        modal.classList.remove('hide');
         document.body.style.overflow = 'hidden';
-        modalBlock.remove();
         clearInterval(modalTimeId);
     }
+
     formInput.forEach((i)=>{
         i.addEventListener('focus', ()=>{
             clearInterval(modalTimeId);
         });
     });
+
     function deleteClassShow() {
-        modal.classList.toggle('show');
+        modal.classList.remove('show');
         document.body.style.overflow = '';
+        clearInterval(deleteClassShow);
     }
 
     btn.forEach(btn =>{
         btn.addEventListener('click', addClassShow);
     });
 
-    close.addEventListener('click', deleteClassShow);
-
     modal.addEventListener('click', (e)=>{
-        if(e.target === modal){
+        if(e.target === modal||e.target.getAttribute('data-close')==''){
             deleteClassShow();
         }
     });
@@ -137,7 +135,7 @@ document.addEventListener('DOMContentLoaded', function(){
         }
     });
 
-    const modalTimeId = setTimeout(addClassShow, 5000);
+    const modalTimeId = setTimeout(addClassShow, 10000);
 
 
     function showModalByScroll() {
@@ -209,7 +207,7 @@ newCardMenu("img/tabs/post.jpg","post",'"Постное"','Меню “Пост�
 //-----------------Forms
 
 const forms = document.querySelectorAll('form');
-const messege = {
+const message = {
     loading: 'img/form/spinner.svg',
     success: 'Спасибо! Ваш запрос принят)',
     failure: 'Что-то пошло не так...'
@@ -224,58 +222,51 @@ function postData (form){
         e.preventDefault();
 
         const statusMessage = document.createElement('img');
-        statusMessage.src = messege.loading;
+        statusMessage.src = message.loading;
         statusMessage.style.cssText = `
             display: block;
             margin: 0 auto;
+            margin-top: 30px;
         `;
-        form.appendChild (statusMessage);
+        form.insertAdjacentElement('afterend',statusMessage);
 
         const r = new XMLHttpRequest();
         r.open('POST', 'server.php');
-        // r.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-
+        
         const formData = new FormData(form);
 
         r.send(formData);
 
         r.addEventListener('load', ()=>{
             if(r.status === 200){
-                modal.classList.add('show');
-                console.log(r.response);
                 form.reset();
+                closeModal(message.success);
                 statusMessage.remove();
-                closeModal();
-                setTimeout(()=>{
-                    modal.classList.remove('show');
-                    modalBlock.remove();
-                }, 4000);
-            } else {statusMessage.textContent = messege.failure;}
+            } else {closeModal(message.failure);statusMessage.remove();}
         });
 
-        function closeModal (){
-            const modalContent = document.querySelector('.modal__content');
-                modalBlock.classList.add('modalBlock');
-                modalContent.append(modalBlock);
-                modalBlock.style.position = 'absolute';    
-                modalBlock.style.left = '0px';
-                modalBlock.style.top = '0px';
-                modalBlock.style.width = '100%';
-                modalBlock.style.height = '100%';
-                modalBlock.style.backgroundColor = 'white';
-                modalBlock.style.display = 'flex';
-                modalBlock.style.alignItems = 'center';
-                modalBlock.innerHTML = `<div class="modal__close">&times;</div>
-                <div class="modal__title">Мы свяжемся с вами как можно быстрее!</div>`;
+        function closeModal (message){
+            const prevModalDialog = document.querySelector('.modal__dialog');
+            prevModalDialog.classList.add('hide');
             
-            const closeModal = document.querySelectorAll('.modal__close');
-            closeModal.forEach(item=>{
-                item.addEventListener('click', ()=>{
-                    modal.classList.toggle('show');
-                    document.body.style.overflow = '';
-                    modalBlock.remove();
-                });
-            });
+            
+            const thanksModal = document.createElement('div');
+            thanksModal.classList.add('modal__dialog');
+            thanksModal.innerHTML = `
+            <div class="modal__content">
+                <div class="modal__close" data-close>×</div>
+                <div class="modal__title">${message}</div>
+            </div>
+            `;
+            document.querySelector('.modal').append(thanksModal);
+            addClassShow();
+
+            setTimeout(()=>{
+                prevModalDialog.classList.remove('hide');
+                prevModalDialog.classList.add('show');
+                thanksModal.remove();
+                deleteClassShow();
+            },2500);
         }
     });
 }

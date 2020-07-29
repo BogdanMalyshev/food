@@ -231,12 +231,20 @@ function postData (form){
         form.insertAdjacentElement('afterend',statusMessage);
         
         const formData = new FormData(form);
-
+        const object = {};
+        formData.forEach((value, i)=>{
+            object[i] = value;
+        });
         fetch('server.php',{
             method: 'POST',
-            body: formData
-        }).then(data =>{
-            console.log(data.json);
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(object)
+        }).then(data=>
+            data.text()
+        ).then(data =>{
+            console.log(data);
             form.reset();
             closeModal(message.success);
             statusMessage.remove();

@@ -229,20 +229,22 @@ function postData (form){
             margin-top: 30px;
         `;
         form.insertAdjacentElement('afterend',statusMessage);
-
-        const r = new XMLHttpRequest();
-        r.open('POST', 'server.php');
         
         const formData = new FormData(form);
 
-        r.send(formData);
-
-        r.addEventListener('load', ()=>{
-            if(r.status === 200){
-                form.reset();
-                closeModal(message.success);
-                statusMessage.remove();
-            } else {closeModal(message.failure);statusMessage.remove();}
+        fetch('server.php',{
+            method: 'POST',
+            body: formData
+        }).then(data =>{
+            console.log(data.json);
+            form.reset();
+            closeModal(message.success);
+            statusMessage.remove();
+        }).catch(()=>{
+            closeModal(message.failure);
+            statusMessage.remove();
+        }).finally(()=>{
+            form.reset();
         });
 
         function closeModal (message){

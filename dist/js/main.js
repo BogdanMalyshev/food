@@ -241,8 +241,7 @@ function postData (form){
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(object)
-        }).then(data=>
-            data.text()
+        }).then(data=>data.text()
         ).then(data =>{
             console.log(data);
             form.reset();
